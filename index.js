@@ -23,11 +23,26 @@ function init() {
       console.log(username);
 
       axios
-        .get(`https://api.github.com/users/${username}/events/public`)
+        .get(`https://api.github.com/users/${username}`)
         .then(function (res) {
           console.log(res.data);
           var avatar = res.data.avatar_url;
+          var email ="himom@github.com"
           console.log(`avatar ${avatar}`);
+
+          fs.writeFile("log.md", `${username}'s read me![image of ${username}](${avatar})`, function(err) {
+
+            if (err) {
+              return console.log(err);
+            }
+          
+            console.log("Success!");
+          
+          });
+
+
+
+
         });
 
     });
