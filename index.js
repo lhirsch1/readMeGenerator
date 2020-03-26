@@ -23,10 +23,11 @@ function init() {
       console.log(username);
 
       axios
-        .get(`https://api.github.com/users/${username}`)
+        .get(`https://api.github.com/users/${username}/events/public`)
         .then(function (res) {
           console.log(res.data);
-          //avatar_url
+          var avatar = res.data.avatar_url;
+          console.log(`avatar ${avatar}`);
         });
 
     });
