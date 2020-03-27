@@ -148,7 +148,7 @@ async function generateQuestions() {
         markDownString += `## Usage:\n * ${data.usage} \n`
       }
       if (data.hasOwnProperty("contributorList")) {
-        markDownString += ` ##Contributors: ${data.contributorList} \n`
+        markDownString += ` ## Contributors: ${data.contributorList} \n`
       }
       if (data.hasOwnProperty("license")) {
         markDownString += `## License: ${data.license} \n`
