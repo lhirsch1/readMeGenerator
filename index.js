@@ -16,8 +16,9 @@ const repoArray = [];
 
 var markDownString = '';
 
-function writeToFile(fileName, data) {
+function writeToFile(fileName,data) {
   appendFileAsync(fileName,data);
+  console.log("done");
 }
 
 function init() {
@@ -40,16 +41,13 @@ function init() {
           
           //for loop puts repo names into an array
           for (i = 0; i < res.data.length; i++) {
-            //console.log(res.data[i].name);
+            
             repoArray.push(res.data[i].name);
           }
           console.log("owner ", res.data[0].owner);
           console.log(repoArray);
           avatar = res.data[0].avatar_url;
           var email = "himom@github.com"
-          //console.log(`avatar ${avatar}`);
-
-          // console.log(userName)
           generateQuestions(userName,avatar,repoArray);
 
           fs.writeFile("log.md", `${username}'s read me![image of ${username}](${avatar})`, function (err) {
@@ -69,24 +67,6 @@ function init() {
 
 init();
 
-
-
-// project title, description, table of cont, installation, usage, license, contributing, tests, questions,profile pic, githubemail
-
-//create new readme.md file
-//populate read me with info from git hub
-
-//table of contents
-//add a link for every chunk user chooses to do. 
-
-
-
-
-//elements to save to data variable
-//badge
-
-
-//inputs
 
 
 async function generateQuestions() {
@@ -115,15 +95,16 @@ async function generateQuestions() {
       console.log('hi')
     }
   }
+  //instantiate questions
   const qRepo = new ChoiceQuestion('list', "Which repo would you like to make a read me for?", 'repos', repoArray);
   const qTitle = new InputConfirmQuestion('input', 'What is your project title?', 'projectTitle');
-  const qDescription = new InputConfirmQuestion('input', 'What is your project description?', 'description');
-  const qInstallation = new InputConfirmQuestion('input', 'What are the instalation instructions?', 'installation');
-  const qUsage = new InputConfirmQuestion('input', 'What is your usage tips?', 'usage');
+  const qDescription = new InputConfirmQuestion('input', 'Enter text for project description?', 'description');
+  const qInstallation = new InputConfirmQuestion('input', 'Enter text for installation instructions?', 'installation');
+  const qUsage = new InputConfirmQuestion('input', 'Enter text for usage tips?', 'usage');
   const qContributors = new InputConfirmQuestion('input', `List contributor's GitHub usernames separated by spaces`, `contributorList`);
   const qTests = new InputConfirmQuestion('input', 'Enter text for Tests section', 'tests');
   const qQuestions = new InputConfirmQuestion('input', 'Enter text for Questions section', 'questions');
-  const qLicense = new ChoiceQuestion('checkbox', 'Which license would you like to use?', 'license', ['MIT', 'GPLv2', 'Apache']);
+  const qLicense = new ChoiceQuestion('list', 'Which license would you like to use?', 'license', ['MIT', 'GPLv2', 'Apache']);
   const qTableOfContents = new InputConfirmQuestion('confirm', 'Would you like a table of contents?', 'table');
   
   
@@ -144,52 +125,42 @@ async function generateQuestions() {
     }
 
     inquirer.prompt(qArray).then(function (data) {
-
-      
-      
       if (data.hasOwnProperty("projectTitle")) {
-        
-        appendFileAsync('readme2.md', `Title: ${data.projectTitle} \n`);
-        markDownString += `Title: ${data.projectTitle} \n`
+        markDownString += `## Title: ${data.projectTitle} \n`
       }
       if (data.hasOwnProperty("repos")) {
-        appendFileAsync('readme2.md', `Repository: ${data.repos} \n`);
-        markDownString += `Repository: ${data.repos} \n`
+        markDownString += `## Repository: ${data.repos} \n`
       }
       if (data.hasOwnProperty("table")) {
-        appendFileAsync('readme2.md', `Table of Contents: \n`);
-        markDownString += `Table of Contents: \n`
+        markDownString += `## Table of Contents: \n`
         for(const property in data){
-          console.log(`${property}: ${data[property]}`)
-          appendFileAsync('readme2.md', `     table: ${data[property]} \n`);
-          markDownString +=`     table: ${data[property]} \n`
+          markDownString +=`* [${property}](#${property}) \n`
         }
-        console.log("md string ",markDownString);
       }
       if (data.hasOwnProperty("description")) {
-        appendFileAsync('readme2.md', `Description: ${data.description} \n`);
+        markDownString +=`## description: \n ${data.description} \n`
         
       }
       if (data.hasOwnProperty("installation")) {
-        appendFileAsync('readme2.md', `Installation: ${data.installation} \n`);
+        markDownString += `## installation:  ${data.installation} \n`
       }
       if (data.hasOwnProperty("usage")) {
-        appendFileAsync('readme2.md', `Usage: ${data.usage} \n`);
+        markDownString += `## Usage:\n * ${data.usage} \n`
       }
       if (data.hasOwnProperty("contributorList")) {
-        appendFileAsync('readme2.md', `Contributors: ${data.contributorList} \n`);
+        markDownString += ` ##Contributors: ${data.contributorList} \n`
       }
       if (data.hasOwnProperty("license")) {
-        appendFileAsync('readme2.md', `License: ${data.license} \n`);
+        markDownString += `## License: ${data.license} \n`
       }
       if (data.hasOwnProperty("tests")) {
-        appendFileAsync('readme2.md', `Tests: ${data.tests} \n`);
+        markDownString += `## Tests: ${data.tests} \n`
       }
       if (data.hasOwnProperty("questions")) {
-        appendFileAsync('readme2.md', `Questions: ${data.questions} \n`);
+        markDownString += `## Questions: ${data.questions} \n`
       }
 
-      markDownString +=  `${userName}'s read me![image of ${userName}](${avatar})`;
+      markDownString +=  `##${userName}'s read me![image of ${userName}](${avatar})`;
       writeToFile('newreadme.md',markDownString);
 
     }).catch(function (err) {
