@@ -1,42 +1,50 @@
+//requiring dependencies
 const axios = require('axios');
 const fs = require('fs');
 const util = require('util');
 const inquirer = require('inquirer');
 
+//creating async function in a variable
 const appendFileAsync = util.promisify(fs.appendFile);
 
+//array to hold questions
 let qArray;
 
+//variables for github data
 let userName = '';
 let avatar = '';
 
-const questions = [];
-
+//array holds user repos
 const repoArray = [];
 
+//variable to generate markdown string
 var markDownString = '';
 
+//function is called to write data to new file
 function writeToFile(fileName,data) {
   appendFileAsync(fileName,data);
   console.log("done");
 }
 
+//init function runs api call and calls other functions
 function init() {
 
   //repos https://api.github.com/users/lhirsch1/repos
 
+  //inquirer used to make CLI prompts
   inquirer
     .prompt({
+      //prompt gets user github name
       message: "Enter your GitHub username:",
       name: "username"
     })
+    //promise funciton calls API
     .then(function ({ username }) {
-      //console.log(username);
-
       //axios call to github retrives user information
       axios
         .get(`https://api.github.com/users/${username}/repos`)
         .then(function (res) {
+          //sets username variable to input
           userName = username;
           
           //for loop puts repo names into an array
@@ -44,55 +52,41 @@ function init() {
             
             repoArray.push(res.data[i].name);
           }
-          console.log("owner ", res.data[0].owner);
-          console.log(repoArray);
+          //gets avatar image from github
           avatar = res.data[0].avatar_url;
-          var email = "himom@github.com"
+  
+          //calls generate questions function w/parameters
           generateQuestions(userName,avatar,repoArray);
 
-          fs.writeFile("log.md", `${username}'s read me![image of ${username}](${avatar})`, function (err) {
-
-            if (err) {
-              return console.log(err);
-            }
-
           
-
-          });
         });
       //add error handing for username search
 
     });
 }
 
+//calls init function
 init();
 
-
-
+//generate questions creates prompts to get user input to create MD file
 async function generateQuestions() {
 
-  //class to construct questions that are type input and confirm
+  //class to construct questions that that 3 parameters
   class InputConfirmQuestion {
     constructor(type, message, name) {
       this.type = type;
       this.message = message;
       this.name = name;
     }
-    makeQuestion() {
-      console.log('hi')
-    }
   }
 
-  //class to construct questions with multiple choices
+  //class to construct questions with multiple choices (take 4 parameters)
   class ChoiceQuestion {
     constructor(type, message, name, choices) {
       this.type = type;
       this.message = message;
       this.name = name;
       this.choices = choices
-    }
-    makeQuestion() {
-      console.log('hi')
     }
   }
   //instantiate questions
@@ -111,7 +105,7 @@ async function generateQuestions() {
   //elements question asks which items user would like to have in their read me
   const qElements = new ChoiceQuestion('checkbox', 'Which of these elements would you like in your read me?', 'elements', ['Title', 'Repo', 'Installation', 'Usage', 'License', 'Contributors', 'TableOfContents', 'Tests','Questions'])
 
-  
+  //asks qElements question to user 
   inquirer.prompt([qElements]).then(function (data) {
     //take data array, add q to start insert into inquirer
     qArray = data.elements;
@@ -121,9 +115,9 @@ async function generateQuestions() {
     for (i = 0; i < qArray.length;) {
       qArray[i] = eval('q' + qArray[i]);
       i++
-      //console.log(qArray);
     }
 
+    //questions are asked to the user based on previous response
     inquirer.prompt(qArray).then(function (data) {
       if (data.hasOwnProperty("projectTitle")) {
         markDownString += `## Title: ${data.projectTitle} \n`
@@ -159,8 +153,9 @@ async function generateQuestions() {
       if (data.hasOwnProperty("questions")) {
         markDownString += `## Questions: ${data.questions} \n`
       }
-
+      //adds github data to markupstring
       markDownString +=  `##${userName}'s read me![image of ${userName}](${avatar})`;
+      //calls writeToFile function
       writeToFile('newreadme.md',markDownString);
 
     }).catch(function (err) {
@@ -169,30 +164,3 @@ async function generateQuestions() {
   }
   )
 }
-//project title
-//description
-//which elements
-//installation
-//usage
-
-
-//confirms
-
-
-//table of contents
-//contributing
-
-
-//list
-//license
-
-
-
-
-
-
-
-//tests
-
-//questions
-
