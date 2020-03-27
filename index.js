@@ -14,6 +14,8 @@ const questions = [];
 
 const repoArray = [];
 
+var markDownString = '';
+
 function writeToFile(fileName, data) {
 }
 
@@ -117,13 +119,17 @@ async function generateQuestions() {
   const qDescription = new InputConfirmQuestion('input', 'What is your project description?', 'description');
   const qInstallation = new InputConfirmQuestion('input', 'What are the instalation instructions?', 'installation');
   const qUsage = new InputConfirmQuestion('input', 'What is your usage tips?', 'usage');
-  const qAddContributors = new InputConfirmQuestion('input', `List contributor's GitHub usernames separated by spaces`, `contributorList`);
-  //const qTests = new InputConfirmQuestion('input', 'Enter text for Tests section', 'tests');
-  //elements question asks which items user would like to have in their read me
-  const qElements = new ChoiceQuestion('checkbox', 'Which of these elements would you like in your read me?', 'elements', ['Title', 'Repo', 'Installation', 'Usage', 'License', 'Contributors', 'TableOfContents'])
-
+  const qContributors = new InputConfirmQuestion('input', `List contributor's GitHub usernames separated by spaces`, `contributorList`);
+  const qTests = new InputConfirmQuestion('input', 'Enter text for Tests section', 'tests');
+  const qQuestions = new InputConfirmQuestion('input', 'Enter text for Questions section', 'questions');
   const qLicense = new ChoiceQuestion('checkbox', 'Which license would you like to use?', 'license', ['MIT', 'GPLv2', 'Apache']);
+  const qTableOfContents = new InputConfirmQuestion('confirm', 'Would you like a table of contents?', 'table');
+  
+  
+  //elements question asks which items user would like to have in their read me
+  const qElements = new ChoiceQuestion('checkbox', 'Which of these elements would you like in your read me?', 'elements', ['Title', 'Repo', 'Installation', 'Usage', 'License', 'Contributors', 'TableOfContents', 'Tests','Questions'])
 
+  
   inquirer.prompt([qElements]).then(function (data) {
     //take data array, add q to start insert into inquirer
     qArray = data.elements;
@@ -137,16 +143,29 @@ async function generateQuestions() {
     }
 
     inquirer.prompt(qArray).then(function (data) {
-      console.log(data);
+      
       if (data.hasOwnProperty("projectTitle")) {
         
         appendFileAsync('readme2.md', `Title: ${data.projectTitle} \n`);
+        markDownString += `Title: ${data.projectTitle} \n`
       }
       if (data.hasOwnProperty("repos")) {
         appendFileAsync('readme2.md', `Repository: ${data.repos} \n`);
+        markDownString += `Repository: ${data.repos} \n`
+      }
+      if (data.hasOwnProperty("table")) {
+        appendFileAsync('readme2.md', `Table of Contents: \n`);
+        markDownString += `Table of Contents: \n`
+        for(const property in data){
+          console.log(`${property}: ${data[property]}`)
+          appendFileAsync('readme2.md', `     table: ${data[property]} \n`);
+          markDownString +=`     table: ${data[property]} \n`
+        }
+        console.log("md string ",markDownString);
       }
       if (data.hasOwnProperty("description")) {
         appendFileAsync('readme2.md', `Description: ${data.description} \n`);
+        
       }
       if (data.hasOwnProperty("installation")) {
         appendFileAsync('readme2.md', `Installation: ${data.installation} \n`);
@@ -159,6 +178,12 @@ async function generateQuestions() {
       }
       if (data.hasOwnProperty("license")) {
         appendFileAsync('readme2.md', `License: ${data.license} \n`);
+      }
+      if (data.hasOwnProperty("tests")) {
+        appendFileAsync('readme2.md', `Tests: ${data.tests} \n`);
+      }
+      if (data.hasOwnProperty("questions")) {
+        appendFileAsync('readme2.md', `Questions: ${data.questions} \n`);
       }
 
     }).catch(function (err) {
