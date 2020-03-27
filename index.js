@@ -17,6 +17,7 @@ const repoArray = [];
 var markDownString = '';
 
 function writeToFile(fileName, data) {
+  appendFileAsync(fileName,data);
 }
 
 function init() {
@@ -36,7 +37,7 @@ function init() {
         .get(`https://api.github.com/users/${username}/repos`)
         .then(function (res) {
           userName = username;
-          console.log(userName);
+          
           //for loop puts repo names into an array
           for (i = 0; i < res.data.length; i++) {
             //console.log(res.data[i].name);
@@ -143,6 +144,8 @@ async function generateQuestions() {
     }
 
     inquirer.prompt(qArray).then(function (data) {
+
+      
       
       if (data.hasOwnProperty("projectTitle")) {
         
@@ -185,6 +188,9 @@ async function generateQuestions() {
       if (data.hasOwnProperty("questions")) {
         appendFileAsync('readme2.md', `Questions: ${data.questions} \n`);
       }
+
+      markDownString +=  `${userName}'s read me![image of ${userName}](${avatar})`;
+      writeToFile('newreadme.md',markDownString);
 
     }).catch(function (err) {
       console.log(err);
